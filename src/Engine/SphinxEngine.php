@@ -100,14 +100,12 @@ class SphinxEngine extends AbstractEngine
     {
         $model        = $builder->model;
         $index        = $model->searchableAs();
-        $column_index = $model->toSearchableArray();
+        /*A column method was added because I use $this->array() inside toSearchableArray() to dynamically build the searcahable array and it was empty when called the previous way*/
+        $columns      = $model->searchableColumns();
 
-        if (array_key_exists('id', $column_index)) {
-            unset($column_index['id']);
+        if ($key = array_search('id',$columns)) {
+            unset($columns[$key]);
         }
-
-        $columns = array_keys($column_index);
-
         $query = SphinxQL::create($this->connections)
             ->select("*")
             ->from($index)
@@ -118,7 +116,6 @@ class SphinxEngine extends AbstractEngine
                 $query->option($name,$option);
             }
         }
-
         if ($limit = $builder->limit) {
             $query = $query->limit($limit);
         }
