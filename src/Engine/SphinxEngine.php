@@ -113,6 +113,12 @@ class SphinxEngine extends AbstractEngine
             ->from($index)
             ->match($columns, $builder->query);
 
+        if(method_exists($model,'searchableOptions')){
+            foreach($model->searchableOptions() as $name => $option){
+                $query->option($name,$option);
+            }
+        }
+
         if ($limit = $builder->limit) {
             $query = $query->limit($limit);
         }
