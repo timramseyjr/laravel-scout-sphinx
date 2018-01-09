@@ -182,10 +182,12 @@ class SphinxEngine extends AbstractEngine
         $key = collect($results->getStored())
             ->pluck($model->getKeyName())
             ->values()->all();
-
+        /*When whereIn is used mysql/postgres does not retain order from sphinx*/
         return $model
             ->whereIn($model->getKeyName(), $key)
-            ->get();
+            ->get()->sortBy(function($model) use ($key) {
+                return array_search($model->getKey(), $key);
+            });
     }
     /**
      * [mapIds description]
